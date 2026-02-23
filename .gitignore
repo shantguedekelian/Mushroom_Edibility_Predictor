@@ -1,1 +1,16 @@
 data/
+# Virtual environments
+venv/
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# OS
+.DS_Store
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
