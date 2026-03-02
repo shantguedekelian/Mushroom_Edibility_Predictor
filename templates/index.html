@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Mushroom Challenge</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="script.js" type="module"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+<img src="{{ url_for('static', filename='placeholder.jpg') }}">
 </head>
 
 <body>

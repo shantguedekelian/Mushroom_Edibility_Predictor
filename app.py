@@ -1,3 +1,6 @@
+import os
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+
 from flask import Flask, render_template, jsonify, send_file
 import torch
 from torchvision import transforms
@@ -54,15 +57,25 @@ app = Flask(__name__)
 # -------------------------
 
 def get_random_image():
-    classes = os.listdir(DATA_DIR)
-    chosen_class = random.choice(classes)
+    all_images = []
 
-    class_folder = os.path.join(DATA_DIR, chosen_class)
-    img_name = random.choice(os.listdir(class_folder))
+    for root, dirs, files in os.walk(DATA_DIR):
+        for file in files:
+            if file.lower().endswith((".jpg", ".jpeg", ".png")):
+                full_path = os.path.join(root, file)
 
-    img_path = os.path.join(class_folder, img_name)
+                # Label is the folder right under /test/
+                relative_path = os.path.relpath(full_path, DATA_DIR)
+                label = relative_path.split(os.sep)[0]
 
-    return img_path, chosen_class
+                all_images.append((full_path, label))
+
+    if not all_images:
+        raise Exception("No images found in test directory")
+
+    return random.choice(all_images)
+
+
 
 
 def predict_image(img_path):
