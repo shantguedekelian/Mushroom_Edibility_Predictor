@@ -103,15 +103,20 @@ def get_image():
     model_prediction = predict_image(img_path)
 
     return jsonify({
-        "image_path": img_path,
-        "true_label": true_label,
-        "model_prediction": model_prediction
-    })
+    "image_path": f"/image/{img_path}",
+    "model_prediction": model_prediction,
+    "true_label": true_label
+})
 
 
-@app.route('/data/<path:filename>')
+# @app.route('/data/<path:filename>')
+# def serve_image(filename):
+#     return send_file(os.path.join("data", filename))
+
+
+@app.route('/image/<path:filename>')
 def serve_image(filename):
-    return send_file(os.path.join("data", filename))
+    return send_file(filename)
 
 # -------------------------
 # Run

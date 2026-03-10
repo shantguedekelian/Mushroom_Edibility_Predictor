@@ -1,19 +1,10 @@
 // ----------------------------
-// Fake dataset (for now)
-// ----------------------------
-const mushrooms = [
-    {img: "data/mushrooms/train/edible/Agaricus/000_ePQknW8cTp8.jpg", label: "edible"},
-    {img: "data/mushrooms/train/poisonous/Amanita_abrupta/Amanita_abrupta4.png", label: "poisonous"},
-    {img: "data/mushrooms/train/edible/blue_roundhead/3.png", label: "edible"},
-    {img: "data/mushrooms/train/poisonous/Cortinarius_cinnabarinus/Cortinarius_cinnabarinus2.png", label: "poisonous"},
-];
-
-// ----------------------------
 // State
 // ----------------------------
 let userScore = 0;
 let modelScore = 0;
-let currentMushroom = null;
+let currentTrueLabel = null;
+let currentModelPrediction = null;
 
 // DOM
 const imageEl = document.getElementById("mushroomImage");
@@ -22,33 +13,44 @@ const userScoreEl = document.getElementById("userScore");
 const modelScoreEl = document.getElementById("modelScore");
 
 // ----------------------------
-// Load random mushroom
+// Fetch new mushroom from backend
 // ----------------------------
-function loadRandomMushroom() {
-    const index = Math.floor(Math.random() * mushrooms.length);
-    currentMushroom = mushrooms[index];
+async function loadRandomMushroom() {
 
-    imageEl.src = currentMushroom.img;
-    resultEl.innerHTML = "<p>Make your guess!</p>";
+    try {
+        const response = await fetch("/get_image");
+        const data = await response.json();
+
+        console.log(data);
+
+        // Save truth + model prediction
+        currentTrueLabel = data.true_label;
+        currentModelPrediction = data.model_prediction;
+
+        // Show image
+        imageEl.src = data.image_path;
+
+        resultEl.innerHTML = "<p>Make your guess!</p>";
+
+    } catch (error) {
+        console.error("Error loading mushroom:", error);
+    }
 }
 
-loadRandomMushroom();
-
+// ----------------------------
+// Handle user guess
+// ----------------------------
 function handleGuess(userGuess) {
 
-    // Ground truth
-    const correct = currentMushroom.label;
-
-    // Simulated model guess
-    const modelGuess = Math.random() > 0.5 ? "edible" : "poisonous";
+    if (!currentTrueLabel) return;
 
     // Update user score
-    if (userGuess === correct) {
+    if (userGuess === currentTrueLabel) {
         userScore++;
     }
 
     // Update model score
-    if (modelGuess === correct) {
+    if (currentModelPrediction === currentTrueLabel) {
         modelScore++;
     }
 
@@ -57,12 +59,18 @@ function handleGuess(userGuess) {
     modelScoreEl.textContent = modelScore;
 
     resultEl.innerHTML = `
-        <p><strong>Correct:</strong> ${correct}</p>
+        <p><strong>Correct:</strong> ${currentTrueLabel}</p>
         <p><strong>You guessed:</strong> ${userGuess}</p>
-        <p><strong>Model guessed:</strong> ${modelGuess}</p>
+        <p><strong>Model guessed:</strong> ${currentModelPrediction}</p>
     `;
 }
+
+// ----------------------------
+// Button Events
+// ----------------------------
 document.querySelector(".edible").onclick = () => handleGuess("edible");
 document.querySelector(".poisonous").onclick = () => handleGuess("poisonous");
-
 document.querySelector(".next").onclick = loadRandomMushroom;
+
+// Load first mushroom on page load
+loadRandomMushroom();
