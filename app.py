@@ -18,7 +18,7 @@ from model_definition import get_model
 IMAGENET_MEAN = [0.485, 0.456, 0.406]
 IMAGENET_STD  = [0.229, 0.224, 0.225]
 
-DATA_DIR = "data/mushrooms/test"  # use test split for game
+DATA_DIR = "game_images"  # use test split for game
 
 device = torch.device("cpu")
 
